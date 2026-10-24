@@ -68,6 +68,7 @@ class AdapterKind(str, Enum):
     HTTP = "http"
     OPENAI_COMPATIBLE = "openai_compatible"
     MCP = "mcp"
+    LOCAL = "local"  # in-process instrumented agent (tier 3)
     STUB = "stub"  # for tests / dry runs
 
 
