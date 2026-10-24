@@ -47,6 +47,16 @@ target + seeds → adapter → agent (sandboxed) → deterministic judge → fin
 
 Five pieces, each typed and testable: a **target adapter** (HTTP / OpenAI-compatible / stub), a YAML **seed library** (attacks as data), a **multi-turn attacker** that adapts across turns but never sees the canary, the **deterministic judge** (the anti-cheat core), and **assurance reporting** with control attribution.
 
+## Onboarding a real agent
+
+The adapter layer lets you point RedForge at an agent that lives anywhere — three tiers of integration, weakest to strongest:
+
+- **Black-box HTTP** — a chat endpoint URL; output-side proofs only.
+- **Framework adapters** — observe a real agent through its framework's native hooks: LangChain / LangGraph, the OpenAI Agents SDK, CrewAI, or any MCP client session. Full tool log, agent runs with its own tools (on staging).
+- **Instrumented tool substitution** — run the agent against recording mock tools, in-process or inside the Docker sandbox: full evidence with **zero real side effects** (no mail sent, no host reached). The strongest and safest path.
+
+The deterministic judge is unchanged across all three — only the source of the evidence changes. See **[ADAPTERS.md](./ADAPTERS.md)** for the onboarding contract and per-framework wiring.
+
 ## Quick start
 
 ```bash

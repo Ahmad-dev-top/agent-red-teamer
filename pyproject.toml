@@ -25,6 +25,9 @@ demo = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
 ]
+langchain = ["langchain-core>=0.3"]
+"openai-agents" = ["openai-agents>=0.2"]
+crewai = ["crewai>=0.86"]
 
 [project.scripts]
 redforge-agents = "redforge_agents.cli:main"
