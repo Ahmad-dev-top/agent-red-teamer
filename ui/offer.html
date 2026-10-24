@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RedForge Agents — engagements & pricing</title>
+<meta name="description" content="How I red-team your tool-using AI agent: assessment, hardening, and continuous retainer — with evidence-backed findings and honest control attribution." />
+<style>
+  :root{
+    --bg:#0a0b0e; --bg-2:#101218; --panel:#13161e; --panel-2:#171b25;
+    --line:#242938; --line-2:#2f3647;
+    --ink:#eef1f7; --muted:#9aa3b5; --faint:#6b7488;
+    --ember:#ff4d2e; --ember-2:#ff7a52; --ember-glow:rgba(255,77,46,.16);
+    --good:#35d07f; --good-dim:rgba(53,208,127,.14);
+    --warn:#f5b93b; --bad:#ff5a6a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    --r:16px; --maxw:1120px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:
+      radial-gradient(1100px 560px at 80% -10%,rgba(255,77,46,.10),transparent 60%),
+      radial-gradient(900px 500px at 8% 0%,rgba(80,120,255,.06),transparent 55%),var(--bg);
+    color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  .mono{font-family:var(--mono)} .ember{color:var(--ember)}
+
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,11,14,.72);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;text-decoration:none}
+  .mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(145deg,var(--ember),#b8220d);box-shadow:0 0 18px var(--ember-glow);font-size:15px}
+  .nav nav{display:flex;gap:26px;align-items:center}
+  .nav nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500}
+  .nav nav a:hover{color:var(--ink)}
+  .nav .ghub{border:1px solid var(--line-2);padding:7px 14px;border-radius:9px;color:var(--ink)}
+  .nav .ghub:hover{border-color:var(--ember)}
+  @media(max-width:640px){.nav nav a.hide-sm{display:none}}
+
+  .hero{padding:66px 0 34px;text-align:center}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ember-2);
+    border:1px solid var(--line-2);background:var(--panel);padding:6px 13px;border-radius:999px;
+    letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ember);box-shadow:0 0 10px var(--ember)}
+  h1{font-size:clamp(2rem,5.5vw,3.3rem);line-height:1.05;letter-spacing:-.035em;margin:20px auto 0;max-width:18ch;font-weight:800}
+  .sub{color:var(--muted);font-size:clamp(1rem,2.3vw,1.18rem);max-width:60ch;margin:16px auto 0}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .btn{padding:13px 22px;border-radius:11px;font-weight:600;font-size:15px;text-decoration:none;
+    border:1px solid transparent;cursor:pointer;transition:.15s;display:inline-flex;gap:9px;align-items:center}
+  .btn.p{background:linear-gradient(145deg,var(--ember),#d8300f);color:#fff;box-shadow:0 8px 30px var(--ember-glow)}
+  .btn.p:hover{transform:translateY(-1px)}
+  .btn.s{background:var(--panel);border-color:var(--line-2);color:var(--ink)}
+  .btn.s:hover{border-color:var(--ember)}
+
+  section.block{padding:58px 0}
+  .eyebrow{color:var(--ember-2);font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+  h2{font-size:clamp(1.55rem,4vw,2.2rem);letter-spacing:-.03em;margin:10px 0 0;font-weight:800}
+  .lede{color:var(--muted);max-width:62ch;margin:14px 0 0;font-size:16px}
+
+  /* process */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:34px;counter-reset:s}
+  @media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.steps{grid-template-columns:1fr}}
+  .st{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 20px;position:relative}
+  .st::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);
+    font-size:12px;color:var(--ember-2)}
+  .st h3{margin:12px 0 6px;font-size:16px;letter-spacing:-.01em}
+  .st p{margin:0;color:var(--muted);font-size:13.5px}
+
+  /* packages */
+  .pkgs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px;align-items:start}
+  @media(max-width:860px){.pkgs{grid-template-columns:1fr;max-width:460px;margin-inline:auto}}
+  .pkg{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px 22px;position:relative;display:flex;flex-direction:column}
+  .pkg.feat{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember),0 30px 70px -45px var(--ember)}
+  .pkg .flag{position:absolute;top:-11px;left:22px;background:linear-gradient(145deg,var(--ember),#d8300f);
+    color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:4px 11px;border-radius:999px}
+  .pkg .ic{font-size:22px}
+  .pkg h3{margin:12px 0 2px;font-size:19px;letter-spacing:-.01em}
+  .pkg .tl{color:var(--faint);font-size:13px;margin:0 0 16px}
+  .pkg .pr{font-family:var(--mono);font-size:14px;color:var(--ember-2);margin:0 0 16px}
+  .pkg ul{list-style:none;padding:0;margin:0 0 20px;flex:1}
+  .pkg li{position:relative;padding:7px 0 7px 24px;color:var(--muted);font-size:14px;border-bottom:1px solid var(--line)}
+  .pkg li:last-child{border-bottom:none}
+  .pkg li::before{content:"✓";position:absolute;left:0;top:7px;color:var(--good);font-weight:700}
+  .pkg .btn{width:100%;justify-content:center}
+
+  /* deliverables / trust */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:30px}
+  @media(max-width:780px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+  .card h3{margin:0 0 14px;font-size:17px}
+  .card ul{margin:0;padding-left:20px;color:var(--muted);font-size:14.5px}
+  .card ul li{margin:8px 0}
+  .card ul li b{color:var(--ink);font-weight:600}
+
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}
+  @media(max-width:700px){.trust{grid-template-columns:1fr}}
+  .tr{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .tr b{display:block;margin-bottom:4px}
+  .tr p{margin:0;color:var(--muted);font-size:13.5px}
+
+  .final{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);
+    border-radius:20px;padding:44px 32px;text-align:center;margin:18px 0 10px}
+  footer{border-top:1px solid var(--line);padding:30px 0;color:var(--faint);font-size:13.5px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted);text-decoration:none} footer a:hover{color:var(--ember)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="mark">⚒</span> RedForge <span class="ember">Agents</span></a>
+    <nav>
+      <a href="index.html" class="hide-sm">Overview</a>
+      <a href="#process" class="hide-sm">Process</a>
+      <a href="#packages" class="hide-sm">Packages</a>
+      <a class="ghub" href="mailto:m.ahmadon1789@gmail.com">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="tag"><span class="dot"></span> Engagements</span>
+    <h1>Red-team your AI agent. Get proof, not opinions.</h1>
+    <p class="sub">If your agent can send email, move money, touch a filesystem, or call MCP tools, it has an attack surface. I find it, <b class="ember">prove each break with hard evidence</b>, harden it at the tool layer, and re-test until the attack-success rate is measurably zero.</p>
+    <div class="cta">
+      <a class="btn p" href="#packages">See packages</a>
+      <a class="btn s" href="index.html">View the live results ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="block" id="process">
+  <div class="wrap">
+    <span class="eyebrow">How I'd run this against your agent</span>
+    <h2>A fixed, scoped engagement shape.</h2>
+    <p class="lede">No open-ended consulting. A scoped scan, evidence-backed findings, a fix, and a re-test that proves the fix holds — the same find → prove → patch → verify loop shown on the overview.</p>
+    <div class="steps">
+      <div class="st"><h3>Scope &amp; authorize</h3><p>We agree the target (a staging or sandbox copy), the tools in scope, and written authorization. No production data, ever.</p></div>
+      <div class="st"><h3>Scan &amp; prove</h3><p>Your agent is run against the attack library. Every finding is backed by a leaked canary or a forbidden tool call in the log — deterministic, not an LLM's guess.</p></div>
+      <div class="st"><h3>Harden</h3><p>Tool-layer controls designed for your stack — send gates, output DLP, approval gates, budget caps — with the reasoning for each.</p></div>
+      <div class="st"><h3>Verify &amp; report</h3><p>Re-run the campaign; report the ASR drop with honest control attribution — whether your controls or just your model kept you safe.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="block" id="packages">
+  <div class="wrap">
+    <span class="eyebrow">Packages</span>
+    <h2>Pick the depth you need.</h2>
+    <p class="lede">Fixed scope, fixed deliverable. Pricing is indicative and confirmed after a short scoping call.</p>
+    <div class="pkgs">
+      <div class="pkg">
+        <div class="ic">🔍</div>
+        <h3>Assessment</h3>
+        <p class="tl">One agent · ~3–5 days</p>
+        <p class="pr">from $1,500</p>
+        <ul>
+          <li>Full attack-library scan of one agent</li>
+          <li>Evidence-backed findings (canary / tool-log proof)</li>
+          <li>Control-attribution report</li>
+          <li>Prioritized remediation roadmap</li>
+          <li>60-min findings walkthrough</li>
+        </ul>
+        <a class="btn s" href="mailto:m.ahmadon1789@gmail.com?subject=RedForge%20Agents%20—%20Assessment">Book an assessment</a>
+      </div>
+      <div class="pkg feat">
+        <span class="flag">Most popular</span>
+        <div class="ic">🛡️</div>
+        <h3>Hardening</h3>
+        <p class="tl">Assessment + fix + re-verify · ~1–2 weeks</p>
+        <p class="pr">from $4,000</p>
+        <ul>
+          <li>Everything in Assessment</li>
+          <li>Tool-layer controls designed &amp; implemented</li>
+          <li>Re-test proving the ASR drop</li>
+          <li>Verification that every fix is complete</li>
+          <li>Before/after case study for your records</li>
+        </ul>
+        <a class="btn p" href="mailto:m.ahmadon1789@gmail.com?subject=RedForge%20Agents%20—%20Hardening">Start hardening</a>
+      </div>
+      <div class="pkg">
+        <div class="ic">🔁</div>
+        <h3>Retainer</h3>
+        <p class="tl">Continuous · monthly</p>
+        <p class="pr">from $2,000/mo</p>
+        <ul>
+          <li>Red-teaming wired into your CI</li>
+          <li>Every model swap &amp; prompt change re-tested</li>
+          <li>New attack seeds as the threat landscape shifts</li>
+          <li>Monthly assurance report</li>
+          <li>Priority turnaround on new findings</li>
+        </ul>
+        <a class="btn s" href="mailto:m.ahmadon1789@gmail.com?subject=RedForge%20Agents%20—%20Retainer">Discuss a retainer</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES + WHY -->
+<section class="block">
+  <div class="wrap">
+    <div class="grid2">
+      <div class="card">
+        <h3>What you walk away with</h3>
+        <ul>
+          <li><b>A findings report</b> where every claim is backed by hard evidence — a leaked canary or a logged forbidden tool call, reproducible on demand.</li>
+          <li><b>Control attribution</b> for every non-breach: did a durable tool-layer control stop it, or did the model merely choose to refuse?</li>
+          <li><b>Implemented fixes</b> (Hardening+) and a re-test showing the measured attack-success-rate drop.</li>
+          <li><b>A before/after case study</b> you can share internally or with your own customers.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Why this and not a prompt-injection checklist</h3>
+        <ul>
+          <li><b>Agents that take actions</b>, not chatbots that say bad words — the risk is the tool call, and that's what's tested.</li>
+          <li><b>The harness decides success, never an LLM.</b> No self-graded, unreproducible findings.</li>
+          <li><b>Fixes are verified complete.</b> On a live model this loop caught a remediation that looked done but still leaked through a second channel.</li>
+          <li><b>Honest about model vs control.</b> You'll know exactly how much of your safety is a model refusal that can vanish under pressure.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="trust">
+      <div class="tr"><b>🔒 Sandboxed</b><p>Untrusted code runs in a network-isolated Docker sandbox — dropped capabilities, non-root, read-only root.</p></div>
+      <div class="tr"><b>✍️ Authorized only</b><p>Only agents you own or have written permission to test, against staging or a sandbox copy. Never production data.</p></div>
+      <div class="tr"><b>📄 Reproducible</b><p>Every finding ships with the evidence and the steps to reproduce it. Nothing is asserted on faith.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="final">
+      <span class="eyebrow">Next step</span>
+      <h2 style="max-width:20ch;margin-inline:auto">Let's find the break before someone else does.</h2>
+      <p class="sub">Send a two-line description of your agent — what it does and what tools it can call — and I'll tell you what a scan would cover.</p>
+      <div class="cta">
+        <a class="btn p" href="mailto:m.ahmadon1789@gmail.com?subject=RedForge%20Agents%20—%20Scoping">Email me your agent</a>
+        <a class="btn s" href="https://github.com/ahmad-dev-top/agent-red-teamer" target="_blank" rel="noopener">See the project ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div>RedForge Agents · autonomous red-teamer for tool-using AI agents</div>
+  <div>Built by Muhammad Ahmad · <a href="https://github.com/ahmad-dev-top" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:m.ahmadon1789@gmail.com">Email</a></div>
+</footer>
+
+</body>
+</html>
