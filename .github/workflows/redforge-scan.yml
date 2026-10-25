@@ -1,0 +1,50 @@
+name: RedForge Agents scan
+
+# Continuous red-teaming: run the attack campaign on every push and PR, and fail
+# the build if the agent breaches. This is the "retainer" tier as code — every
+# model swap or prompt change is re-tested before it ships.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install RedForge Agents
+        run: pip install -e .
+
+      - name: Red-team scan (gates the build)
+        run: |
+          redforge-agents ci examples/inbox_assistant/target.yaml \
+            --adapter stub \
+            --fail-on high \
+            --json reports/ci-report.json \
+            --summary "$GITHUB_STEP_SUMMARY"
+        # Point --adapter http at a staging endpoint (set the target's config.url)
+        # to scan a real agent. Keep secrets in GitHub Actions secrets, never here.
+        #
+        # Regression mode — fail only on NEW findings vs an accepted baseline:
+        #   redforge-agents ci <target> --baseline reports/baseline.json ...
+        # Commit reports/baseline.json after a reviewed scan; the build then
+        # blocks any new break a change introduces, not known/accepted ones.
+
+      - name: Upload scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: redforge-report
+          path: reports/ci-report.json
+          if-no-files-found: warn
