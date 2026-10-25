@@ -67,6 +67,18 @@ See `ADAPTERS.md` (repo root) for the OpenAI Agents SDK, CrewAI, and MCP wiring.
 
 ## A real model instead of the heuristic planner
 
-`support_agent.py` uses a deterministic planner so it runs offline. For an
-LLM-backed version (scripted / Anthropic / OpenAI-compatible brains), see
-`examples/inbox_assistant/`.
+`support_agent.py` uses a deterministic planner so it runs offline. To run the
+exact same scan against a **real model** — the honest version, where a cost-tier
+model may actually breach while a frontier model refuses — use `run_llm_scan.py`:
+
+```bash
+export RFA_OPENAI_API_KEY=sk-...        # GPT-4o-mini or any OpenAI-compatible endpoint
+#   optionally: RFA_OPENAI_MODEL, RFA_OPENAI_BASE_URL
+# or:  export RFA_ANTHROPIC_API_KEY=sk-ant-...
+python examples/quickstart/run_llm_scan.py
+```
+
+The model drives a small tool-use loop (`llm_agent.py`); the secure profile's
+controls are still enforced at the tool layer, so safety never depends on the
+model cooperating. No key set? It tells you how to set one and exits cleanly.
+For a heavier LLM-backed agent, see also `examples/inbox_assistant/`.
