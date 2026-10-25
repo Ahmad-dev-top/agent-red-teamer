@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RedForge Agents — onboard your agent</title>
+<meta name="description" content="Tell us about the agent you want red-teamed. We turn this into a scan spec and get back to you with scope and timing." />
+<style>
+  :root{
+    --bg:#0a0b0e; --bg-2:#101218; --panel:#13161e; --panel-2:#171b25;
+    --line:#242938; --line-2:#2f3647;
+    --ink:#eef1f7; --muted:#9aa3b5; --faint:#6b7488;
+    --ember:#ff4d2e; --ember-2:#ff7a52; --ember-glow:rgba(255,77,46,.16);
+    --good:#35d07f; --good-dim:rgba(53,208,127,.14);
+    --warn:#f5b93b; --bad:#ff5a6a;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    --r:16px; --maxw:860px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:
+      radial-gradient(1000px 520px at 82% -10%,rgba(255,77,46,.10),transparent 60%),
+      radial-gradient(820px 460px at 6% 0%,rgba(80,120,255,.06),transparent 55%),var(--bg);
+    color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  .mono{font-family:var(--mono)} .ember{color:var(--ember)}
+
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,11,14,.72);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;max-width:1120px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;text-decoration:none}
+  .mark{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(145deg,var(--ember),#b8220d);box-shadow:0 0 18px var(--ember-glow);font-size:15px}
+  .nav nav{display:flex;gap:26px;align-items:center}
+  .nav nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500}
+  .nav nav a:hover{color:var(--ink)}
+  @media(max-width:560px){.nav nav a.hide-sm{display:none}}
+
+  .hero{padding:52px 0 10px;text-align:center}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ember-2);
+    border:1px solid var(--line-2);background:var(--panel);padding:6px 13px;border-radius:999px;
+    letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ember);box-shadow:0 0 10px var(--ember)}
+  h1{font-size:clamp(1.9rem,5vw,2.9rem);line-height:1.06;letter-spacing:-.035em;margin:18px auto 0;max-width:20ch;font-weight:800}
+  .sub{color:var(--muted);font-size:clamp(1rem,2.2vw,1.12rem);max-width:58ch;margin:14px auto 0}
+
+  form{margin:34px 0 0}
+  form,.result{scroll-margin-top:84px}
+  fieldset{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);
+    padding:24px;margin:0 0 18px}
+  legend{padding:0 10px;font-size:13px;color:var(--ember-2);font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.row{grid-template-columns:1fr}}
+  .field{margin:0 0 16px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+  label .req{color:var(--ember)}
+  .hint{font-size:12.5px;color:var(--faint);margin:0 0 8px}
+  input[type=text],input[type=email],input[type=url],textarea,select{
+    width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;
+    color:var(--ink);font:inherit;font-size:15px;padding:11px 13px;transition:.15s}
+  textarea{min-height:84px;resize:vertical;font-family:var(--mono);font-size:13.5px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ember);box-shadow:0 0 0 3px var(--ember-glow)}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:36px}
+  .check{display:flex;gap:11px;align-items:flex-start;font-size:14px;color:var(--muted);margin:0 0 12px;cursor:pointer}
+  .check:last-child{margin-bottom:0}
+  .check input{margin-top:3px;width:16px;height:16px;accent-color:var(--ember);flex:none}
+  .check b{color:var(--ink);font-weight:600}
+
+  .note{display:flex;gap:11px;align-items:flex-start;background:var(--panel-2);border-left:3px solid var(--ember);
+    border-radius:0 10px 10px 0;padding:14px 16px;font-size:13.5px;color:var(--muted);margin:0 0 16px}
+  .note b{color:var(--ink)}
+
+  .pills{display:flex;flex-wrap:wrap;gap:10px}
+  .pill{position:relative}
+  .pill input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .pill span{display:inline-block;padding:9px 15px;border:1px solid var(--line-2);border-radius:999px;
+    font-size:14px;color:var(--muted);transition:.15s;cursor:pointer;user-select:none}
+  .pill input:checked + span{border-color:var(--ember);color:var(--ink);background:var(--ember-glow)}
+  .pill input:focus-visible + span{box-shadow:0 0 0 3px var(--ember-glow)}
+
+  .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .btn{padding:13px 22px;border-radius:11px;font-weight:600;font-size:15px;text-decoration:none;
+    border:1px solid transparent;cursor:pointer;transition:.15s;display:inline-flex;gap:9px;align-items:center;font-family:inherit}
+  .btn.p{background:linear-gradient(145deg,var(--ember),#d8300f);color:#fff;box-shadow:0 8px 30px var(--ember-glow)}
+  .btn.p:hover{transform:translateY(-1px)}
+  .btn.s{background:var(--panel);border-color:var(--line-2);color:var(--ink)}
+  .btn.s:hover{border-color:var(--ember)}
+  .err{color:var(--bad);font-size:13.5px;margin-top:10px;min-height:1px}
+
+  /* result */
+  .result{display:none;margin:26px 0 0}
+  .result.show{display:block}
+  .result h2{font-size:1.5rem;letter-spacing:-.02em;margin:0 0 6px}
+  .result .ok{color:var(--good);font-weight:600}
+  .out{background:var(--bg-2);border:1px solid var(--line-2);border-radius:12px;padding:16px;
+    font-family:var(--mono);font-size:13px;white-space:pre-wrap;word-break:break-word;color:var(--ink);margin:14px 0}
+  .out.yaml{color:#d7e0f2}
+  .outhead{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+  .outhead h3{font-size:15px;margin:0}
+  .copy{background:var(--panel);border:1px solid var(--line-2);color:var(--muted);font:inherit;font-size:12.5px;
+    padding:6px 12px;border-radius:8px;cursor:pointer}
+  .copy:hover{border-color:var(--ember);color:var(--ink)}
+
+  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--faint);font-size:13.5px;margin-top:30px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted);text-decoration:none} footer a:hover{color:var(--ember)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="mark">⚒</span> RedForge <span class="ember">Agents</span></a>
+    <nav>
+      <a href="index.html" class="hide-sm">Overview</a>
+      <a href="offer.html" class="hide-sm">Packages</a>
+      <a href="mailto:m.ahmadon1789@gmail.com">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="tag"><span class="dot"></span> Agent onboarding</span>
+    <h1>Tell me about the agent you want red-teamed.</h1>
+    <p class="sub">A few details turn into a scan spec. Fill this in, send it, and I'll come back with scope, the integration path, and timing. Takes about three minutes.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <form id="intake" novalidate>
+    <fieldset>
+      <legend>Your details</legend>
+      <div class="row">
+        <div class="field">
+          <label for="name">Name <span class="req">*</span></label>
+          <input type="text" id="name" name="name" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="email">Work email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" required />
+        </div>
+      </div>
+      <div class="field">
+        <label for="company">Company / project</label>
+        <input type="text" id="company" name="company" autocomplete="organization" />
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your agent</legend>
+      <div class="field">
+        <label for="agentname">Agent name <span class="req">*</span></label>
+        <input type="text" id="agentname" name="agentname" placeholder="e.g. Support copilot" required />
+      </div>
+      <div class="field">
+        <label for="what">What does it do, and what can it act on? <span class="req">*</span></label>
+        <p class="hint">The tools it can call are the attack surface — email, payments, filesystem, internal APIs, MCP servers, etc.</p>
+        <textarea id="what" name="what" placeholder="A support agent that reads tickets and can issue refunds, send email, and look up customer records." required></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>How I'd reach it</legend>
+      <div class="field">
+        <label>Integration path <span class="req">*</span></label>
+        <p class="hint">Not sure? Pick "Help me choose" and I'll work it out with you.</p>
+        <div class="pills" id="tier">
+          <label class="pill"><input type="radio" name="tier" value="HTTP endpoint" required /><span>HTTP endpoint</span></label>
+          <label class="pill"><input type="radio" name="tier" value="Framework (hooks)" /><span>Framework</span></label>
+          <label class="pill"><input type="radio" name="tier" value="Instrumented sandbox" /><span>Sandboxed (mock tools)</span></label>
+          <label class="pill"><input type="radio" name="tier" value="Help me choose" /><span>Help me choose</span></label>
+        </div>
+      </div>
+      <div class="field" id="frameworkField" style="display:none">
+        <label for="framework">Which framework?</label>
+        <select id="framework" name="framework">
+          <option value="">Select…</option>
+          <option>LangChain / LangGraph</option>
+          <option>OpenAI Agents SDK</option>
+          <option>CrewAI</option>
+          <option>MCP (Model Context Protocol)</option>
+          <option>Other / custom</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="endpoint">Staging endpoint or repo (optional)</label>
+        <p class="hint">A staging/sandbox target only — never production.</p>
+        <input type="url" id="endpoint" name="endpoint" placeholder="https://staging.example.com/agent" />
+      </div>
+      <div class="note">
+        <span>🔒</span>
+        <div><b>Don't put any API keys or secrets in this form.</b> If a scoped, revocable staging key is needed, we'll arrange that over a secure channel after we talk.</div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Tool surface &amp; sensitive data</legend>
+      <div class="field">
+        <label for="tools">Tools the agent can call</label>
+        <p class="hint">One per line. Mark the sensitive ones and any policy, e.g. <span class="mono">send_email — external recipients not allowed</span>.</p>
+        <textarea id="tools" name="tools" placeholder="read_customer_record&#10;send_email — internal domains only&#10;issue_refund — max $50, needs approval"></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="internal">Internal/allowed domains</label>
+          <p class="hint">Sends here count as internal, not exfiltration.</p>
+          <input type="text" id="internal" name="internal" placeholder="acme.com, acme.internal" />
+        </div>
+        <div class="field">
+          <label for="sensitive">Confidential data it can access</label>
+          <p class="hint">What we'd tag with a canary to prove a leak.</p>
+          <input type="text" id="sensitive" name="sensitive" placeholder="customer records, API tokens" />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Engagement</legend>
+      <div class="field">
+        <label>What are you after?</label>
+        <div class="pills" id="package">
+          <label class="pill"><input type="radio" name="package" value="Assessment" /><span>Assessment</span></label>
+          <label class="pill"><input type="radio" name="package" value="Hardening" /><span>Hardening</span></label>
+          <label class="pill"><input type="radio" name="package" value="Retainer" /><span>Retainer</span></label>
+          <label class="pill"><input type="radio" name="package" value="Not sure yet" /><span>Not sure yet</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="notes">Anything else</label>
+        <textarea id="notes" name="notes" placeholder="Timeline, compliance context, specific worries…" style="font-family:var(--sans);font-size:15px"></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Scope &amp; authorization</legend>
+      <label class="check"><input type="checkbox" id="auth1" required /><span>I own this agent, or I have <b>written authorization</b> to have it security-tested.</span></label>
+      <label class="check"><input type="checkbox" id="auth2" required /><span>Testing will run against a <b>staging or sandbox copy</b>, never production data.</span></label>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit" class="btn p">Generate my scan spec →</button>
+      <span style="color:var(--faint);font-size:13px">No account, nothing sent automatically.</span>
+    </div>
+    <div class="err" id="err"></div>
+  </form>
+
+  <section class="result" id="result">
+    <h2><span class="ok">✓</span> Your scan spec is ready</h2>
+    <p class="sub" style="margin:8px 0 0;text-align:left">Email it to me with one click, or copy either block and send it however you like. The YAML is the exact format the scanner takes.</p>
+
+    <div class="outhead"><h3>Summary</h3><button class="copy" data-target="summary">Copy</button></div>
+    <div class="out" id="summary"></div>
+
+    <div class="outhead"><h3>Starter target.yaml</h3><button class="copy" data-target="yaml">Copy</button></div>
+    <div class="out yaml" id="yaml"></div>
+
+    <div class="actions" style="margin-top:18px">
+      <a class="btn p" id="emailBtn" href="#">✉ Email this to me</a>
+      <button class="btn s" type="button" id="editBtn">← Edit answers</button>
+    </div>
+  </section>
+</div>
+
+<footer class="wrap">
+  <div>RedForge Agents · autonomous red-teamer for tool-using AI agents</div>
+  <div>Built by Muhammad Ahmad · <a href="https://github.com/ahmad-dev-top/agent-red-teamer" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:m.ahmadon1789@gmail.com">Email</a></div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var CONTACT = "m.ahmadon1789@gmail.com";
+  var form = document.getElementById("intake");
+  var err = document.getElementById("err");
+  var result = document.getElementById("result");
+
+  // show framework dropdown only when "Framework" is chosen
+  document.getElementById("tier").addEventListener("change", function(e){
+    var show = e.target.value === "Framework (hooks)";
+    document.getElementById("frameworkField").style.display = show ? "" : "none";
+  });
+
+  function val(id){ var el = document.getElementById(id); return el ? el.value.trim() : ""; }
+  function radio(name){ var el = form.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ""; }
+  function slug(s){ return (s||"agent").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,32) || "agent"; }
+  function canary(){
+    var hex = ""; var c = "0123456789abcdef";
+    for (var i=0;i<6;i++) hex += c[Math.floor(Math.random()*16)];
+    return "CANARY-DATA-" + hex;
+  }
+  function esc(s){ return (s||"—"); }
+  function listify(s){ return s.split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean); }
+
+  function adapterFor(tier){
+    if (tier === "HTTP endpoint") return "http";
+    if (tier === "Instrumented sandbox") return "sandbox";
+    if (tier === "Framework (hooks)") return "local";   // framework adapters run in-process
+    return "http";
+  }
+
+  function buildSummary(d){
+    return [
+      "RedForge Agents — scan request",
+      "",
+      "From:        " + d.name + " <" + d.email + ">" + (d.company ? "  ("+d.company+")" : ""),
+      "Agent:       " + d.agentname,
+      "Does:        " + d.what,
+      "Integration: " + d.tier + (d.framework ? " — " + d.framework : ""),
+      "Endpoint:    " + esc(d.endpoint),
+      "Tools:       " + (d.tools.length ? "" : "—"),
+    ].concat(d.tools.map(function(t){ return "  - " + t; }))
+     .concat([
+      "Internal domains: " + esc(d.internal),
+      "Confidential data: " + esc(d.sensitive),
+      "Package:     " + esc(d.package),
+      "Notes:       " + esc(d.notes),
+      "",
+      "Authorization confirmed: owns/authorized + staging-only.",
+    ]).join("\n");
+  }
+
+  function buildYaml(d){
+    var readTool = null;
+    var toolLines = d.tools.map(function(t){
+      var name = t.split(/[\s—:-]/)[0] || "tool";
+      var sensitive = /forbid|never|not allow|only|cap|approv|max|block/i.test(t);
+      if (!readTool && /read|get|lookup|fetch|record|list/i.test(name)) readTool = name;
+      var line = "  - name: " + name;
+      if (sensitive) line += "\n    tripwire: true   # " + t.replace(/\s+/g," ");
+      return line;
+    });
+    if (!readTool) readTool = "read_record";
+    var domains = listify(d.internal.replace(/,/g,"\n"));
+    return [
+      "id: " + slug(d.agentname),
+      "name: " + (d.agentname || "Agent under test"),
+      "adapter: " + adapterFor(d.tier) + "   # see ADAPTERS.md for wiring",
+      "config:",
+      "  # endpoint/entrypoint — confirmed on our call",
+      "  url: " + (d.endpoint || "TODO"),
+      "  internal_domains: [" + domains.map(function(x){return '"'+x+'"';}).join(", ") + "]",
+      "tools:",
+    ].concat(toolLines.length ? toolLines : ["  - name: send_email", "  - name: " + readTool])
+     .concat([
+      "canaries:",
+      "  - id: confidential_record",
+      "    value: \"" + canary() + "\"   # tags: " + (d.sensitive || "the sensitive record"),
+      "    placed_in: \"tool_result:" + readTool + "\"",
+      "step_budget: 20",
+      "cost_budget_usd: 1.0",
+    ]).join("\n");
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    err.textContent = "";
+    var required = ["name","email","agentname","what"];
+    for (var i=0;i<required.length;i++){
+      if (!val(required[i])){ err.textContent = "Please fill in the required fields."; document.getElementById(required[i]).focus(); return; }
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val("email"))){ err.textContent = "That email doesn't look right."; return; }
+    if (!radio("tier")){ err.textContent = "Please pick an integration path."; return; }
+    if (!document.getElementById("auth1").checked || !document.getElementById("auth2").checked){
+      err.textContent = "Please confirm both authorization boxes."; return;
+    }
+
+    var d = {
+      name: val("name"), email: val("email"), company: val("company"),
+      agentname: val("agentname"), what: val("what"),
+      tier: radio("tier"), framework: val("framework"),
+      endpoint: val("endpoint"), tools: listify(val("tools")),
+      internal: val("internal"), sensitive: val("sensitive"),
+      package: radio("package"), notes: val("notes"),
+    };
+
+    var summary = buildSummary(d);
+    var yaml = buildYaml(d);
+    document.getElementById("summary").textContent = summary;
+    document.getElementById("yaml").textContent = yaml;
+
+    var subject = "RedForge Agents scan request — " + d.agentname;
+    var body = summary + "\n\n--- starter target.yaml ---\n" + yaml;
+    document.getElementById("emailBtn").href =
+      "mailto:" + CONTACT + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+    form.style.display = "none";
+    result.classList.add("show");
+    result.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  document.getElementById("editBtn").addEventListener("click", function(){
+    result.classList.remove("show");
+    form.style.display = "";
+    form.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var text = document.getElementById(btn.getAttribute("data-target")).textContent;
+      var done = function(){ var o = btn.textContent; btn.textContent = "Copied ✓"; setTimeout(function(){ btn.textContent = o; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done, done); }
+      else {
+        var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
