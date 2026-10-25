@@ -118,7 +118,7 @@
     <nav>
       <a href="index.html" class="hide-sm">Overview</a>
       <a href="offer.html" class="hide-sm">Packages</a>
-      <a href="mailto:m.ahmadon1789@gmail.com">Contact</a>
+      <a href="mailto:sardarmuhammaddgr@gmail.com">Contact</a>
     </nav>
   </div>
 </header>
@@ -251,7 +251,7 @@
 
   <section class="result" id="result">
     <h2><span class="ok">✓</span> Your scan spec is ready</h2>
-    <p class="sub" style="margin:8px 0 0;text-align:left">Email it to me with one click, or copy either block and send it however you like. The YAML is the exact format the scanner takes.</p>
+    <p class="sub" style="margin:8px 0 0;text-align:left">Send it straight to my inbox with one click, or copy either block. The YAML is the exact format the scanner takes.</p>
 
     <div class="outhead"><h3>Summary</h3><button class="copy" data-target="summary">Copy</button></div>
     <div class="out" id="summary"></div>
@@ -263,18 +263,19 @@
       <a class="btn p" id="emailBtn" href="#">✉ Email this to me</a>
       <button class="btn s" type="button" id="editBtn">← Edit answers</button>
     </div>
+    <p class="err" id="sendStatus" style="color:var(--muted)"></p>
   </section>
 </div>
 
 <footer class="wrap">
   <div>RedForge Agents · autonomous red-teamer for tool-using AI agents</div>
-  <div>Built by Muhammad Ahmad · <a href="https://github.com/ahmad-dev-top/agent-red-teamer" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:m.ahmadon1789@gmail.com">Email</a></div>
+  <div>Built by Muhammad Ahmad · <a href="https://github.com/ahmad-dev-top/agent-red-teamer" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:sardarmuhammaddgr@gmail.com">Email</a></div>
 </footer>
 
 <script>
 (function(){
   "use strict";
-  var CONTACT = "m.ahmadon1789@gmail.com";
+  var CONTACT = "sardarmuhammaddgr@gmail.com";
   var form = document.getElementById("intake");
   var err = document.getElementById("err");
   var result = document.getElementById("result");
@@ -385,12 +386,59 @@
 
     var subject = "RedForge Agents scan request — " + d.agentname;
     var body = summary + "\n\n--- starter target.yaml ---\n" + yaml;
-    document.getElementById("emailBtn").href =
+    var emailBtn = document.getElementById("emailBtn");
+    emailBtn.dataset.subject = subject;
+    emailBtn.dataset.body = body;
+    emailBtn.dataset.replyto = d.email;
+    emailBtn.dataset.fromname = d.name;
+    emailBtn.dataset.sent = "";
+    emailBtn.textContent = "✉ Email this to me";
+    emailBtn.href =
       "mailto:" + CONTACT + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    document.getElementById("sendStatus").textContent = "";
 
     form.style.display = "none";
     result.classList.add("show");
     result.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+
+  document.getElementById("emailBtn").addEventListener("click", function(e){
+    e.preventDefault();
+    var btn = this;
+    var status = document.getElementById("sendStatus");
+    if (btn.dataset.sending === "1" || btn.dataset.sent === "1") return;
+    if (!btn.dataset.body){ status.textContent = "Generate the scan spec first."; return; }
+    btn.dataset.sending = "1";
+    btn.textContent = "Sending…";
+    status.textContent = "";
+    fetch("https://formsubmit.co/ajax/" + encodeURIComponent(CONTACT), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({
+        name: btn.dataset.fromname,
+        email: btn.dataset.replyto,
+        _replyto: btn.dataset.replyto,
+        _subject: btn.dataset.subject,
+        _template: "box",
+        _captcha: "false",
+        message: btn.dataset.body
+      })
+    }).then(function(r){
+      return r.json().then(function(j){ return { ok: r.ok, body: j }; }, function(){ return { ok: false, body: {} }; });
+    }).then(function(res){
+      if (!res.ok || String(res.body.success) === "false") throw new Error("send failed");
+      btn.dataset.sent = "1";
+      btn.dataset.sending = "0";
+      btn.textContent = "Sent";
+      status.style.color = "var(--good)";
+      status.textContent = "Sent to " + CONTACT + ". I'll reply to the work email you entered.";
+    }).catch(function(){
+      btn.dataset.sending = "0";
+      btn.textContent = "✉ Email this to me";
+      status.style.color = "var(--warn)";
+      status.textContent = "The inbox handoff didn't go through. A mail draft to " + CONTACT + " is opening instead.";
+      window.location.href = btn.href;
+    });
   });
 
   document.getElementById("editBtn").addEventListener("click", function(){
